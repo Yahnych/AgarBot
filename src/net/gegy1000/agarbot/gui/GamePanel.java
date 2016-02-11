@@ -85,22 +85,26 @@ public class GamePanel extends JPanel
         int actualX = cell.x;
         int actualY = cell.y;
 
-        int relativeX = (actualX - cameraX) + 500;
-        int relativeY = (actualY - cameraY) + 400;
+        int drawSize = cell.size * 2;
 
-        int size = cell.size * 5;
+        int relativeX = ((actualX - cameraX) + 500) - (drawSize / 2);
+        int relativeY = ((actualY - cameraY) + 400) - (drawSize / 2);
 
         g.setColor(new Color(cell.red, cell.green, cell.blue));
-        g.fillOval(relativeX, relativeY, size, size);
+        g.fillOval(relativeX, relativeY, drawSize, drawSize);
 
         String name = cell.name;
 
         g.setColor(Color.WHITE);
 
-        int textX = relativeX + (size / 2);
-        int textY = relativeY + (size / 2) + 5;
+        int textX = relativeX + (drawSize / 2);
+        int textY = relativeY + (drawSize / 2);
         drawCenteredString(g, name, textX, textY);
-        drawCenteredString(g, "" + cell.size, textX, textY + 15);
+
+        if (cell.size > 15)
+        {
+            drawCenteredString(g, "" + cell.size, textX, textY + 15);
+        }
     }
 
     private int getAverage(int... values)

@@ -21,7 +21,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,9 +40,9 @@ public class NetworkManager extends WebSocketClient
         this.connect();
     }
 
-    public static NetworkManager create(ServerLocation serverLocation, GameMode gameMode, String game) throws Exception
+    public static NetworkManager create(ServerLocation serverLocation, GameMode gameMode) throws Exception
     {
-        URI uri = getURIAndInit(serverLocation, gameMode, game);
+        URI uri = getURIAndInit(serverLocation, gameMode);
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Origin", "http://agar.io");
@@ -53,23 +52,26 @@ public class NetworkManager extends WebSocketClient
 
     public void sendPacketToServer(PacketAgarBase packet)
     {
-        try
+        if (open)
         {
-            AgarByteBuffer buffer = new AgarByteBuffer();
-            packet.send(buffer);
+            try
+            {
+                AgarByteBuffer buffer = new AgarByteBuffer();
+                packet.send(buffer);
 
-            buffer.resetIndex();
-            buffer.incrementIndex(-1);
-            buffer.writeByte((byte) (packet.getDiscriminator()));
+                buffer.resetIndex();
+                buffer.incrementIndex(-1);
+                buffer.writeByte((byte) (packet.getDiscriminator()));
 
-            byte[] data = buffer.toBytes();
-            send(data);
-            System.out.println("Sent packet " + packet.getClass().getSimpleName() + " (id " + packet.getDiscriminator() + ") with data " + Arrays.toString(data));
-        }
-        catch (Exception e)
-        {
-            System.err.println("Error while sending packet with id " + packet.getDiscriminator() + "!");
-            e.printStackTrace();
+                byte[] data = buffer.toBytes();
+                send(data);
+//            System.out.println("Sent packet " + packet.getClass().getSimpleName() + " (id " + packet.getDiscriminator() + ") with data " + Arrays.toString(data));
+            }
+            catch (Exception e)
+            {
+                System.err.println("Error while sending packet with id " + packet.getDiscriminator() + "!");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -93,16 +95,16 @@ public class NetworkManager extends WebSocketClient
         clientPackets.put(id, packet);
     }
 
-    public static URI getURIAndInit(ServerLocation serverLocation, GameMode gameMode, String game) throws Exception
+    public static URI getURIAndInit(ServerLocation serverLocation, GameMode gameMode) throws Exception
     {
-        ServerData serverData = getServerData(serverLocation, gameMode, game);
+        ServerData serverData = getServerData(serverLocation, gameMode);
         serverIP = "ws://" + serverData.getIp();
         token = serverData.getToken();
 
         return new URI(serverIP);
     }
 
-    public static ServerData getServerData(ServerLocation serverLocation, GameMode gameMode, String name) throws Exception
+    public static ServerData getServerData(ServerLocation serverLocation, GameMode gameMode) throws Exception
     {
         URL url = new URL("http://m.agar.io");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -118,7 +120,7 @@ public class NetworkManager extends WebSocketClient
             gameName += ":" + gameModeFriendlyName;
         }
 
-        String urlParameters = gameName + "\n" + name;
+        String urlParameters = gameName + "\n" + Game.VERSION;
 
         connection.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(connection.getOutputStream());
@@ -136,12 +138,12 @@ public class NetworkManager extends WebSocketClient
     {
         System.out.println("Connected to " + uri + " with token " + token + " and nickname " + Game.NICK);
 
+        open = true;
+
         sendPacketToServer(new PacketServer254Init1());
         sendPacketToServer(new PacketServer255Init2());
         sendPacketToServer(new PacketServer80SendToken(token));
         sendPacketToServer(new PacketServer0SetNick(Game.NICK));
-
-        open = true;
     }
 
     @Override

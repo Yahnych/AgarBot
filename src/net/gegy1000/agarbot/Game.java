@@ -10,13 +10,16 @@ import javax.swing.*;
 
 public class Game
 {
+    public static final String VERSION = "154669603";
     public static World world;
 
     public static final String NICK = "NotABot";
 
     public static NetworkManager networkManager;
 
-    public static void main(String[] args) throws Exception //http://agar.gcommer.com/index.php?title=Protoco
+    public static String globalToken = null;
+
+    public static void main(String[] args) throws Exception
     {
         // Client
         NetworkManager.registerClientPacket(16, PacketClient16UpdateCells.class);
@@ -41,6 +44,8 @@ public class Game
 
         world = new World();
 
+        networkManager = NetworkManager.create(ServerLocation.LONDON, GameMode.FFA);
+
         new Thread(new Runnable()
         {
             @Override
@@ -55,8 +60,6 @@ public class Game
                 }
             }
         }).start();
-
-        networkManager = NetworkManager.create(ServerLocation.LONDON, GameMode.FFA, "");
 
         while (true);
     }

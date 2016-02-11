@@ -120,6 +120,11 @@ public class AgarByteBuffer
 
     public boolean hasNext()
     {
-        return index < bytes.length;
+        return hasNext(0);
+    }
+
+    public boolean hasNext(int count)
+    {
+        return index + count < bytes.length;
     }
 }

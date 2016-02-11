@@ -4,8 +4,6 @@ import net.gegy1000.agarbot.Cell;
 import net.gegy1000.agarbot.Game;
 import net.gegy1000.agarbot.network.AgarByteBuffer;
 
-import java.util.Arrays;
-
 public class PacketClient16UpdateCells extends PacketAgarBase
 {
     @Override
@@ -107,6 +105,11 @@ public class PacketClient16UpdateCells extends PacketAgarBase
 
         for (int i = 0; i < removals; i++)
         {
+            if (!buffer.hasNext(4))
+            {
+                break;
+            }
+
             Game.world.removeCell(buffer.readInteger());
         }
     }

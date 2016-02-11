@@ -1,9 +1,12 @@
 package net.gegy1000.agarbot;
 
+import net.gegy1000.agarbot.network.NetworkManager;
+import net.gegy1000.agarbot.network.packet.PacketServer0SetNick;
 import net.gegy1000.agarbot.network.packet.PacketServer16Move;
+import net.gegy1000.agarbot.network.packet.PacketServer17Split;
+import net.gegy1000.agarbot.network.packet.PacketServer21EjectMass;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class World
@@ -42,6 +45,8 @@ public class World
     public void addPlayerId(int id)
     {
         playerIds.add(id);
+
+        System.out.println("Add player id " + id);
     }
 
     public void setLeaderboard(String[] leaderboard)
@@ -76,11 +81,17 @@ public class World
         {
             cells.remove(toRemove);
         }
+
+        if (playerIds.contains(id))
+        {
+            playerIds.remove((Integer) id);
+            playerDeath();
+        }
     }
 
     public Cell getCellById(int id)
     {
-        for (Cell cell : cells)
+        for (Cell cell : new ArrayList<>(cells))
         {
             if (cell.id == id)
             {
@@ -99,16 +110,29 @@ public class World
         {
             Cell player = getCellById(playerId);
 
-//            if (player != null)
-            {
-                playerCells.add(player);
-            }
-//            else
-//            {
-//                System.out.println("Null player! " + playerId);
-//            }
+            playerCells.add(player);
         }
 
         return playerCells;
+    }
+
+    public void playerDeath()
+    {
+        System.out.println("Player Death");
+
+        Game.networkManager.sendPacketToServer(new PacketServer0SetNick(Game.NICK));
+
+        moveX = 0;
+        moveY = 0;
+    }
+
+    public void split()
+    {
+        Game.networkManager.sendPacketToServer(new PacketServer17Split());
+    }
+
+    public void eject()
+    {
+        Game.networkManager.sendPacketToServer(new PacketServer21EjectMass());
     }
 }

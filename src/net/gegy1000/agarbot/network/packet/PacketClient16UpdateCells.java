@@ -4,6 +4,8 @@ import net.gegy1000.agarbot.Cell;
 import net.gegy1000.agarbot.Game;
 import net.gegy1000.agarbot.network.AgarByteBuffer;
 
+import java.util.Arrays;
+
 public class PacketClient16UpdateCells extends PacketAgarBase
 {
     @Override
@@ -15,43 +17,28 @@ public class PacketClient16UpdateCells extends PacketAgarBase
     @Override
     public void receive(AgarByteBuffer buffer)
     {
-        int eats = buffer.readShort();
+        short eats = buffer.readShort();
 
-        for (int i = 0; i < eats; i++)
+        for(int i = 0; i < eats; i++)
         {
-            int eaterId = buffer.readInteger(); // What do we use this for?
-            int victimId = buffer.readInteger();
+            int eaten = buffer.readInteger();
+            int victim = buffer.readInteger();
 
-            Game.world.removeCell(victimId);
+            Game.world.removeCell(victim);
         }
 
-        addCell(buffer);
+        int id;
 
-//        int removals = buffer.readInteger(); //TODO
-//
-//        System.out.println("Removing " + removals + " cells!");
-//
-//        for (int i = 0; i < removals; i++)
-//        {
-//            int id = buffer.readInteger();
-//            Game.world.removeCell(id);
-//        }
-    }
-
-    private void addCell(AgarByteBuffer buffer)
-    {
-        int id = buffer.readInteger();
-
-        if (id != 0)
+        while ((id = buffer.readInteger()) != 0)
         {
             int x = buffer.readInteger();
             int y = buffer.readInteger();
 
             short size = buffer.readShort();
 
-            byte r = buffer.readByte();
-            byte g = buffer.readByte();
-            byte b = buffer.readByte();
+            byte red = buffer.readByte();
+            byte green = buffer.readByte();
+            byte blue = buffer.readByte();
 
             byte flags = buffer.readByte();
 
@@ -67,7 +54,16 @@ public class PacketClient16UpdateCells extends PacketAgarBase
 
             if (getFlag(flags, (byte) 0b100))
             {
-                skips += 8;
+                String str = "";
+
+                byte c;
+
+                while ((c = buffer.readByte()) != 0)
+                {
+                    str += (char) c;
+                }
+
+                System.out.println("Some string " + str);
             }
 
             if (getFlag(flags, (byte) 0b1000))
@@ -77,13 +73,13 @@ public class PacketClient16UpdateCells extends PacketAgarBase
 
             buffer.incrementIndex(skips);
 
-            short charShort;
-
             String name = "";
 
-            while ((charShort = buffer.readShort()) != 0)
+            short c;
+
+            while ((c = buffer.readShort()) != 0)
             {
-                name += (char) charShort;
+                name += (char) c;
             }
 
             Cell cell = Game.world.getCellById(id);
@@ -91,7 +87,7 @@ public class PacketClient16UpdateCells extends PacketAgarBase
             if (cell == null)
             {
                 cell = new Cell(name, id, x, y, size);
-                cell.setColour(r, g, b);
+                cell.setColour(red, green, blue);
                 cell.virus = isVirus;
 
                 Game.world.addCell(cell);
@@ -103,8 +99,15 @@ public class PacketClient16UpdateCells extends PacketAgarBase
                 cell.y = y;
                 cell.size = size;
                 cell.virus = isVirus;
-                cell.setColour(r, g, b);
+                cell.setColour(red, green, blue);
             }
+        }
+
+        int removals = buffer.readShort();
+
+        for (int i = 0; i < removals; i++)
+        {
+            Game.world.removeCell(buffer.readInteger());
         }
     }
 

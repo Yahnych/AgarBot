@@ -4,6 +4,7 @@ import net.gegy1000.agarbot.Game;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
+import java.awt.Color;
 import java.awt.Graphics;
 
 public class AgarBotFrame extends JFrame
@@ -18,6 +19,7 @@ public class AgarBotFrame extends JFrame
         this.setLocation(0, 0);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.add(new GamePanel());
+        this.setBackground(Color.WHITE);
     }
 
     @Override

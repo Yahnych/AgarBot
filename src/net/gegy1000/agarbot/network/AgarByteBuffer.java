@@ -40,19 +40,6 @@ public class AgarByteBuffer
         writeBytes(ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(i).array());
     }
 
-    public void writeUnsignedInteger(long i)
-    {
-        writeInteger((int) (i + Integer.MIN_VALUE));
-    }
-
-    public void writeString(String s)
-    {
-        byte[] bytes = s.getBytes();
-
-        writeInteger(bytes.length);
-        writeBytes(bytes);
-    }
-
     public void writeFloat(float f)
     {
         writeBytes(ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(f).array());
@@ -68,11 +55,6 @@ public class AgarByteBuffer
         writeBytes(ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort(s).array());
     }
 
-    public void writeUnsignedShort(int s)
-    {
-        writeShort((short) (s + Short.MIN_VALUE));
-    }
-
     public byte readByte()
     {
         byte b = bytes[index];
@@ -84,7 +66,8 @@ public class AgarByteBuffer
     {
         byte[] bytes = new byte[count];
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++)
+        {
             bytes[i] = readByte();
         }
 
@@ -94,17 +77,6 @@ public class AgarByteBuffer
     public int readInteger()
     {
         return ByteBuffer.wrap(readBytes(4)).order(ByteOrder.LITTLE_ENDIAN).getInt();
-    }
-
-    public long readUnsignedInteger()
-    {
-        return readInteger() - Integer.MIN_VALUE;
-    }
-
-    public String readString()
-    {
-        int length = readInteger();
-        return new String(readBytes(length));
     }
 
     public float readFloat()
@@ -120,11 +92,6 @@ public class AgarByteBuffer
     public short readShort()
     {
         return ByteBuffer.wrap(readBytes(2)).order(ByteOrder.LITTLE_ENDIAN).getShort();
-    }
-
-    public int readUnsignedShort()
-    {
-        return readShort() - Short.MIN_VALUE;
     }
 
     public void resetIndex()

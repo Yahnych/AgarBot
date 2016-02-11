@@ -7,6 +7,7 @@ import net.gegy1000.agarbot.World;
 import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,18 +23,6 @@ public class GamePanel extends JPanel
 
     public void paint(Graphics g)
     {
-        String[] leaderboard = Game.world.leaderboard;
-
-        if (leaderboard != null && leaderboard.length > 0)
-        {
-            for (int i = 0; i < leaderboard.length; i++)
-            {
-                String entry = leaderboard[i];
-
-                g.drawString((i + 1) + ". " + entry, 850, (i * 25) + 50);
-            }
-        }
-
         List<Cell> player = Game.world.getPlayerCells();
 
         if (player.size() > 0)
@@ -62,6 +51,33 @@ public class GamePanel extends JPanel
                 drawCell(cell, g, cameraX, cameraY);
             }
         }
+
+        g.setColor(Color.LIGHT_GRAY);
+
+        g.fillRect(840, 10, 160, 280);
+
+        g.setColor(Color.BLACK);
+
+        g.drawString("Leaderboard:", 850, 25);
+
+        String[] leaderboard = Game.world.leaderboard;
+
+        if (leaderboard != null && leaderboard.length > 0)
+        {
+            for (int i = 0; i < leaderboard.length; i++)
+            {
+                String entry = leaderboard[i];
+
+                g.drawString((i + 1) + ". " + entry, 850, (i * 25) + 50);
+            }
+        }
+    }
+
+    private void drawCenteredString(Graphics g, String text, int x, int y)
+    {
+        Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
+
+        g.drawString(text, (int) (x - bounds.getCenterX()), (int) (y - bounds.getCenterY()));
     }
 
     public void drawCell(Cell cell, Graphics g, int cameraX, int cameraY)
@@ -78,9 +94,13 @@ public class GamePanel extends JPanel
         g.fillOval(relativeX, relativeY, size, size);
 
         String name = cell.name;
+
         g.setColor(Color.WHITE);
 
-        g.drawString(name, relativeX + (size / 2), relativeY + (size / 2) + 5);
+        int textX = relativeX + (size / 2);
+        int textY = relativeY + (size / 2) + 5;
+        drawCenteredString(g, name, textX, textY);
+        drawCenteredString(g, "" + cell.size, textX, textY + 15);
     }
 
     private int getAverage(int... values)

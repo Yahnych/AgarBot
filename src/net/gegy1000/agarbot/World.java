@@ -1,6 +1,5 @@
 package net.gegy1000.agarbot;
 
-import net.gegy1000.agarbot.network.NetworkManager;
 import net.gegy1000.agarbot.network.packet.PacketServer0SetNick;
 import net.gegy1000.agarbot.network.packet.PacketServer16Move;
 import net.gegy1000.agarbot.network.packet.PacketServer17Split;

@@ -23,13 +23,23 @@ public class Cell
 
     public void setColour(byte red, byte green, byte blue)
     {
-        this.red = red + 128;
-        this.green = green + 128;
-        this.blue = blue + 128;
-    }
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
 
-    public void update()
-    {
+        if(red < 0)
+        {
+            this.red = red + 256;
+        }
 
+        if(green < 0)
+        {
+            this.green = green + 256;
+        }
+
+        if(blue < 0)
+        {
+            this.blue = blue + 256;
+        }
     }
 }

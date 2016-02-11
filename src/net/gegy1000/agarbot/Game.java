@@ -44,7 +44,7 @@ public class Game
 
         world = new World();
 
-        networkManager = NetworkManager.create(ServerLocation.LONDON, GameMode.FFA);
+        networkManager = NetworkManager.create(ServerLocation.LONDON, GameMode.EXPERIMENTAL);
 
         new Thread(new Runnable()
         {

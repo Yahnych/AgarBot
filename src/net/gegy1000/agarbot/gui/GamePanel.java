@@ -120,17 +120,20 @@ public class GamePanel extends JPanel
         g.setStroke(new BasicStroke(5));
         g.drawOval(relativeX, relativeY, drawSize, drawSize);
 
-        String name = cell.getName();
-
-        g.setColor(Color.WHITE);
-
-        int textX = relativeX + (drawSize / 2);
-        int textY = relativeY + (drawSize / 2);
-        borderCenteredText(g, name, textX, textY);
-
-        if (cell.size > 15)
+        if (!cell.virus)
         {
-            borderCenteredText(g, "" + (cell.size - 22), textX, textY + 15);
+            String name = cell.getName();
+
+            g.setColor(Color.WHITE);
+
+            int textX = relativeX + (drawSize / 2);
+            int textY = relativeY + (drawSize / 2);
+            borderCenteredText(g, name, textX, textY);
+
+            if (cell.size > 15)
+            {
+                borderCenteredText(g, "" + (cell.size - 22), textX, textY + 15);
+            }
         }
     }
 

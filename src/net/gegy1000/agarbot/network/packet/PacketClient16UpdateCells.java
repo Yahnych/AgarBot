@@ -101,7 +101,7 @@ public class PacketClient16UpdateCells extends PacketAgarBase
             }
         }
 
-        int removals = buffer.readShort();
+        int removals = buffer.readInteger();
 
         for (int i = 0; i < removals; i++)
         {

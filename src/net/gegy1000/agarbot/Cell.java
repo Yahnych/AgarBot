@@ -43,6 +43,13 @@ public class Cell
 
     public String getName()
     {
-        return Game.world.nameCache.get(id);
+        String name = Game.world.nameCache.get(id);
+
+        if (name == null)
+        {
+            name = "";
+        }
+
+        return name;
     }
 }

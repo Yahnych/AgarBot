@@ -120,7 +120,7 @@ public class GamePanel extends JPanel
         g.setStroke(new BasicStroke(5));
         g.drawOval(relativeX, relativeY, drawSize, drawSize);
 
-        String name = cell.name;
+        String name = cell.getName();
 
         g.setColor(Color.WHITE);
 

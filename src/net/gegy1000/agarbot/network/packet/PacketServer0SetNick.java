@@ -14,21 +14,14 @@ public class PacketServer0SetNick extends PacketAgarBase
     @Override
     public byte[] send(AgarByteBuffer buffer)
     {
-        byte[] charBytes = new byte[this.nick.toCharArray().length * 2];
-
-        int i = 0;
-
         for(char c : this.nick.toCharArray())
         {
             short charIndex = (short) c;
 
-            charBytes[i] = (byte) (charIndex & 0b1);
-            i++;
-            charBytes[i] = (byte) (charIndex & 0b10);
-            i++;
+            buffer.writeShort(charIndex);
         }
 
-        buffer.writeBytes(charBytes);
+        buffer.writeShort((short) 0);
 
         return super.send(buffer);
     }

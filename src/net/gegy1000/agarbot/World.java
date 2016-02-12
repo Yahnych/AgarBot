@@ -6,12 +6,15 @@ import net.gegy1000.agarbot.network.packet.PacketServer17Split;
 import net.gegy1000.agarbot.network.packet.PacketServer21EjectMass;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class World
 {
     public List<Cell> cells = new ArrayList<Cell>();
     public List<Integer> playerIds = new ArrayList<Integer>();
+    public Map<Integer, String> nameCache = new HashMap<Integer, String>();
 
     public double minSizeX, minSizeY, maxSizeX, maxSizeY;
 
@@ -86,6 +89,8 @@ public class World
             playerIds.remove((Integer) id);
             playerDeath();
         }
+
+        nameCache.remove(id);
     }
 
     public Cell getCellById(int id)

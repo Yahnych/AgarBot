@@ -92,7 +92,7 @@ public class PacketClient16UpdateCells extends PacketAgarBase
             }
             else
             {
-                cell.name = name;
+//                cell.name = name;
                 cell.x = x;
                 cell.y = y;
                 cell.size = size;

@@ -7,14 +7,12 @@ public class Cell
 
     public int x, y;
 
-    public String name;
-
     public int red, green, blue;
     public boolean virus;
 
     public Cell(String name, int id, int x, int y, short size)
     {
-        this.name = name;
+        Game.world.nameCache.put(id, name);
         this.id = id;
         this.x = x;
         this.y = y;
@@ -41,5 +39,10 @@ public class Cell
         {
             this.blue = blue + 256;
         }
+    }
+
+    public String getName()
+    {
+        return Game.world.nameCache.get(id);
     }
 }

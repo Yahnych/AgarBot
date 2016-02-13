@@ -41,9 +41,9 @@ public class Main
         NetworkManager.registerServerPacket(254, PacketServer254Init1.class);
         NetworkManager.registerServerPacket(255, PacketServer255Init2.class);
 
-        Game game = new Game(NICK, ServerLocation.LONDON, GameMode.PARTY, true);
+        Game mainGame = new Game(NICK, ServerLocation.LONDON, GameMode.PARTY, true);
 
-        games.add(game);
+        games.add(mainGame);
 
         while (true)
         {

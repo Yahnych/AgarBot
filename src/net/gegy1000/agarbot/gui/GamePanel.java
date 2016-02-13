@@ -2,6 +2,7 @@ package net.gegy1000.agarbot.gui;
 
 import net.gegy1000.agarbot.Cell;
 import net.gegy1000.agarbot.Game;
+import net.gegy1000.agarbot.Main;
 import net.gegy1000.agarbot.World;
 
 import javax.swing.JPanel;
@@ -17,17 +18,18 @@ import java.util.List;
 
 public class GamePanel extends JPanel
 {
-    private World world = Game.world;
+    private Game game;
 
-    public GamePanel()
+    public GamePanel(Game game)
     {
         super();
+        this.game = game;
         this.setDoubleBuffered(true);
     }
 
     public void paint(Graphics g)
     {
-        List<Cell> player = Game.world.getPlayerCells();
+        List<Cell> player = game.world.getPlayerCells();
 
         Graphics2D g2d = (Graphics2D) g;
 
@@ -54,7 +56,7 @@ public class GamePanel extends JPanel
             int cameraX = getAverage(playerX);
             int cameraY = getAverage(playerY);
 
-            ArrayList<Cell> cells = new ArrayList<>(Game.world.cells);
+            ArrayList<Cell> cells = new ArrayList<>(game.world.cells);
             cells.sort(new Comparator<Cell>()
             {
                 @Override
@@ -77,7 +79,7 @@ public class GamePanel extends JPanel
 
         g.drawString("Leaderboard:", 850, 25);
 
-        String[] leaderboard = Game.world.leaderboard;
+        String[] leaderboard = game.world.leaderboard;
 
         if (leaderboard != null && leaderboard.length > 0)
         {

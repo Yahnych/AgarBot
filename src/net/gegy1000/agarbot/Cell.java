@@ -10,9 +10,12 @@ public class Cell
     public int red, green, blue;
     public boolean virus;
 
-    public Cell(String name, int id, int x, int y, short size)
+    public Game game;
+
+    public Cell(Game game, String name, int id, int x, int y, short size)
     {
-        Game.world.nameCache.put(id, name);
+        this.game = game;
+        this.game.world.nameCache.put(id, name);
         this.id = id;
         this.x = x;
         this.y = y;
@@ -43,7 +46,7 @@ public class Cell
 
     public String getName()
     {
-        String name = Game.world.nameCache.get(id);
+        String name = game.world.nameCache.get(id);
 
         if (name == null)
         {

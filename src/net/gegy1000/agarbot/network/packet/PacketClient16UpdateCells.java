@@ -1,7 +1,7 @@
 package net.gegy1000.agarbot.network.packet;
 
 import net.gegy1000.agarbot.Cell;
-import net.gegy1000.agarbot.Game;
+import net.gegy1000.agarbot.Main;
 import net.gegy1000.agarbot.network.AgarByteBuffer;
 
 public class PacketClient16UpdateCells extends PacketAgarBase
@@ -22,7 +22,7 @@ public class PacketClient16UpdateCells extends PacketAgarBase
             int eaten = buffer.readInteger();
             int victim = buffer.readInteger();
 
-            Game.world.removeCell(victim);
+            game.world.removeCell(victim);
         }
 
         int id;
@@ -80,15 +80,15 @@ public class PacketClient16UpdateCells extends PacketAgarBase
                 name += (char) c;
             }
 
-            Cell cell = Game.world.getCellById(id);
+            Cell cell = game.world.getCellById(id);
 
             if (cell == null)
             {
-                cell = new Cell(name, id, x, y, size);
+                cell = new Cell(game, name, id, x, y, size);
                 cell.setColour(red, green, blue);
                 cell.virus = isVirus;
 
-                Game.world.addCell(cell);
+                game.world.addCell(cell);
             }
             else
             {
@@ -110,7 +110,7 @@ public class PacketClient16UpdateCells extends PacketAgarBase
                 break;
             }
 
-            Game.world.removeCell(buffer.readInteger());
+            game.world.removeCell(buffer.readInteger());
         }
     }
 

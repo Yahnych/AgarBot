@@ -1,6 +1,6 @@
 package net.gegy1000.agarbot.network.packet;
 
-import net.gegy1000.agarbot.Game;
+import net.gegy1000.agarbot.Main;
 import net.gegy1000.agarbot.network.AgarByteBuffer;
 
 public class PacketClient49LeaderboardUpdate extends PacketAgarBase
@@ -35,7 +35,7 @@ public class PacketClient49LeaderboardUpdate extends PacketAgarBase
             leaderboard[i] = nick;
         }
 
-        Game.world.setLeaderboard(leaderboard);
+        game.world.setLeaderboard(leaderboard);
     }
 
     @Override

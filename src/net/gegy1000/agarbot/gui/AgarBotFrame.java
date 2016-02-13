@@ -1,6 +1,7 @@
 package net.gegy1000.agarbot.gui;
 
 import net.gegy1000.agarbot.Game;
+import net.gegy1000.agarbot.Main;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -13,16 +14,20 @@ import java.awt.event.KeyListener;
 
 public class AgarBotFrame extends JFrame
 {
-    public AgarBotFrame()
+    private Game game;
+
+    public AgarBotFrame(Game game)
     {
+        this.game = game;
+
         this.setSize(1000, 800);
-        this.setTitle("agar.io bot - " + Game.NICK);
+        this.setTitle("agar.io bot - " + game.nick);
 
         this.setResizable(false);
 
         this.setLocation(0, 0);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        this.add(new GamePanel());
+        this.add(new GamePanel(game));
         this.setBackground(Color.BLACK);
 
         addKeyListener(new KeyListener()
@@ -38,11 +43,11 @@ public class AgarBotFrame extends JFrame
             {
                 if (e.getKeyChar() == ' ')
                 {
-                    Game.world.split();
+                    game.world.split();
                 }
                 else if (e.getKeyChar() == 'w')
                 {
-                    Game.world.eject();
+                    game.world.eject();
                 }
             }
 
@@ -64,10 +69,9 @@ public class AgarBotFrame extends JFrame
         if (mouse != null)
         {
             Point locationOnScreen = getLocationOnScreen();
-            Game.world.setMove((mouse.x - locationOnScreen.x) - 500, (mouse.y - locationOnScreen.y) - 400);
+            game.world.setMove((mouse.x - locationOnScreen.x) - 500, (mouse.y - locationOnScreen.y) - 400);
         }
 
-//        g.clearRect(0, 0, 1000, 800);
         this.setVisible(true);
     }
 }

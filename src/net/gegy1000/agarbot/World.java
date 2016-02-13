@@ -16,6 +16,8 @@ public class World
     public List<Integer> playerIds = new ArrayList<Integer>();
     public Map<Integer, String> nameCache = new HashMap<Integer, String>();
 
+    public Game game;
+
     public double minSizeX, minSizeY, maxSizeX, maxSizeY;
 
     public float moveX, moveY;
@@ -23,6 +25,11 @@ public class World
     public String[] leaderboard;
 
     public int level, exp, maxExp;
+
+    public World(Game game)
+    {
+        this.game = game;
+    }
 
     public List<Cell> getCells()
     {
@@ -71,7 +78,7 @@ public class World
             this.moveX = x;
             this.moveY = y;
 
-            Game.networkManager.sendPacketToServer(new PacketServer16Move(x, y));
+            game.networkManager.sendPacketToServer(new PacketServer16Move(x, y));
         }
     }
 
@@ -97,7 +104,7 @@ public class World
     {
         for (Cell cell : new ArrayList<>(cells))
         {
-            if (cell.id == id)
+            if (cell != null && cell.id == id)
             {
                 return cell;
             }
@@ -110,7 +117,7 @@ public class World
     {
         List<Cell> playerCells = new ArrayList<>();
 
-        for (int playerId : playerIds)
+        for (int playerId : new ArrayList<>(playerIds))
         {
             Cell player = getCellById(playerId);
 
@@ -122,9 +129,9 @@ public class World
 
     public void playerDeath()
     {
-        System.out.println("Player Death");
+        System.out.println("Game Death");
 
-        Game.networkManager.sendPacketToServer(new PacketServer0SetNick(Game.NICK));
+        game.networkManager.sendPacketToServer(new PacketServer0SetNick(game.nick));
 
         moveX = 0;
         moveY = 0;
@@ -132,11 +139,11 @@ public class World
 
     public void split()
     {
-        Game.networkManager.sendPacketToServer(new PacketServer17Split());
+        game.networkManager.sendPacketToServer(new PacketServer17Split());
     }
 
     public void eject()
     {
-        Game.networkManager.sendPacketToServer(new PacketServer21EjectMass());
+        game.networkManager.sendPacketToServer(new PacketServer21EjectMass());
     }
 }

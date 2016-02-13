@@ -1,6 +1,7 @@
 package net.gegy1000.agarbot.network;
 
 import net.gegy1000.agarbot.Game;
+import net.gegy1000.agarbot.Main;
 import net.gegy1000.agarbot.api.GameMode;
 import net.gegy1000.agarbot.api.ServerData;
 import net.gegy1000.agarbot.api.ServerLocation;
@@ -29,33 +30,43 @@ public class NetworkManager extends WebSocketClient
     private static final Map<Integer, Class<? extends PacketAgarBase>> clientPackets = new HashMap<>();
     private static final Map<Integer, Class<? extends PacketAgarBase>> serverPackets = new HashMap<>();
 
-    private static String serverIP;
-    private static String token;
+    public String ip;
+    public String token;
 
-    public boolean open = false;
+    public Game game;
 
-    private NetworkManager(URI uri, Map<String, String> headers)
+    public boolean isOpen = false;
+
+    private NetworkManager(Game game, String ip, String token, Map<String, String> headers) throws Exception
     {
-        super(uri, new Draft_17(), headers, 0);
+        super(new URI("ws://" + ip), new Draft_17(), headers, 0);
+        this.ip = ip;
+        this.game = game;
+        this.token = token;
         this.connect();
     }
 
-    public static NetworkManager create(ServerLocation serverLocation, GameMode gameMode) throws Exception
+    public static NetworkManager create(Game game, ServerLocation serverLocation, GameMode gameMode) throws Exception
     {
-        URI uri = getURIAndInit(serverLocation, gameMode);
+        return create(game, getServerData(serverLocation, gameMode));
+    }
 
+    public static NetworkManager create(Game game, ServerData serverData) throws Exception
+    {
         Map<String, String> headers = new HashMap<>();
         headers.put("Origin", "http://agar.io");
 
-        return new NetworkManager(uri, headers);
+        return new NetworkManager(game, serverData.getIp(), serverData.getToken(), headers);
     }
 
     public void sendPacketToServer(PacketAgarBase packet)
     {
-        if (open)
+        if (isOpen)
         {
             try
             {
+                packet.setGame(game);
+
                 AgarByteBuffer buffer = new AgarByteBuffer();
                 packet.send(buffer);
 
@@ -95,14 +106,14 @@ public class NetworkManager extends WebSocketClient
         clientPackets.put(id, packet);
     }
 
-    public static URI getURIAndInit(ServerLocation serverLocation, GameMode gameMode) throws Exception
-    {
-        ServerData serverData = getServerData(serverLocation, gameMode);
-        serverIP = "ws://" + serverData.getIp();
-        token = serverData.getToken();
-
-        return new URI(serverIP);
-    }
+//    public static URI getURIAndInit(ServerLocation serverLocation, GameMode gameMode) throws Exception
+//    {
+//        ServerData serverData = getServerData(serverLocation, gameMode);
+//        serverIP = "ws://" + serverData.getIp();
+//        token = serverData.getToken();
+//
+//        return new URI(serverIP);
+//    }
 
     public static ServerData getServerData(ServerLocation serverLocation, GameMode gameMode) throws Exception
     {
@@ -120,7 +131,7 @@ public class NetworkManager extends WebSocketClient
             gameName += ":" + gameModeFriendlyName;
         }
 
-        String urlParameters = gameName + "\n" + Game.VERSION;
+        String urlParameters = gameName + "\n" + Main.VERSION;
 
         connection.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(connection.getOutputStream());
@@ -136,14 +147,14 @@ public class NetworkManager extends WebSocketClient
     @Override
     public void onOpen(ServerHandshake serverHandshake)
     {
-        System.out.println("Connected to " + uri + " with token " + token + " and nickname " + Game.NICK);
+        System.out.println("Connected to " + uri + " with token " + token + " and nickname " + game.nick);
 
-        open = true;
+        isOpen = true;
 
         sendPacketToServer(new PacketServer254Init1());
         sendPacketToServer(new PacketServer255Init2());
         sendPacketToServer(new PacketServer80SendToken(token));
-        sendPacketToServer(new PacketServer0SetNick(Game.NICK));
+        sendPacketToServer(new PacketServer0SetNick(game.nick));
     }
 
     @Override
@@ -165,6 +176,7 @@ public class NetworkManager extends WebSocketClient
         try
         {
             PacketAgarBase packet = NetworkManager.getClientPacketForId(id).getDeclaredConstructor().newInstance();
+            packet.setGame(game);
             packet.receive(buffer);
         }
         catch (Exception e)
@@ -178,7 +190,7 @@ public class NetworkManager extends WebSocketClient
     {
         System.out.println("Connection closed with code " + code + " for reason \"" + reason + "\". Remote = " + remote);
 
-        open = false;
+        isOpen = false;
 
         System.exit(-1);
     }

@@ -124,11 +124,14 @@ public class World
     {
         List<Cell> playerCells = new ArrayList<>();
 
-        for (int playerId : new ArrayList<>(playerIds))
+        if (playerIds != null)
         {
-            Cell player = getCellById(playerId);
+            for (int playerId : new ArrayList<>(playerIds))
+            {
+                Cell player = getCellById(playerId);
 
-            playerCells.add(player);
+                playerCells.add(player);
+            }
         }
 
         return playerCells;
@@ -170,7 +173,7 @@ public class World
 
         if(zoomm > 1)
         {
-            zoomm=1;
+            zoomm = 1;
         }
 
         if(zoomm == -1)

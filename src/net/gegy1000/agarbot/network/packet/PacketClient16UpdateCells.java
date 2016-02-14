@@ -40,17 +40,17 @@ public class PacketClient16UpdateCells extends PacketAgarBase
 
             byte flags = buffer.readByte();
 
-            boolean isVirus = getFlag(flags, 0b1);
-            boolean isAgitated = getFlag(flags, 0b100000); //What does this do?
+            boolean isVirus = getFlag(flags, 1);
+            boolean isAgitated = getFlag(flags, 16); //What does this do?
 
             int skips = 0;
 
-            if (getFlag(flags, (byte) 0b10))
+            if (getFlag(flags, (byte) 2))
             {
                 skips += 4;
             }
 
-            if (getFlag(flags, (byte) 0b100))
+            if (getFlag(flags, (byte) 4))
             {
                 String str = "";
 
@@ -61,10 +61,10 @@ public class PacketClient16UpdateCells extends PacketAgarBase
                     str += (char) c;
                 }
 
-                System.out.println("Some string " + str);
+                System.out.println("Skin: " + str);
             }
 
-            if (getFlag(flags, (byte) 0b1000))
+            if (getFlag(flags, (byte) 8))
             {
                 skips += 16;
             }
@@ -101,16 +101,19 @@ public class PacketClient16UpdateCells extends PacketAgarBase
             }
         }
 
-        int removals = buffer.readInteger();
-
-        for (int i = 0; i < removals; i++)
+        if (buffer.hasNext(4))
         {
-            if (!buffer.hasNext(4))
-            {
-                break;
-            }
+            int removals = buffer.readInteger();
 
-            game.world.removeCell(buffer.readInteger());
+            for (int i = 0; i < removals; i++)
+            {
+                if (!buffer.hasNext(4))
+                {
+                    break;
+                }
+
+                game.world.removeCell(buffer.readInteger());
+            }
         }
     }
 

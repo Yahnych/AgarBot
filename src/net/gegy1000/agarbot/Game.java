@@ -7,7 +7,6 @@ import net.gegy1000.agarbot.gui.AgarBotFrame;
 import net.gegy1000.agarbot.network.NetworkManager;
 
 import javax.swing.JFrame;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Game
@@ -57,6 +56,48 @@ public class Game
     {
         if (networkManager.isOpen)
         {
+            world.update();
+
+            if (world.playerIds.size() > 0)
+            {
+                List<Cell> playerCells = world.getPlayerCells();
+
+                if (playerCells.size() > 0)
+                {
+                    Cell player = playerCells.get(0);
+
+                    if (player != null)
+                    {
+                        Cell eat = null;
+
+                        int highestScore = Integer.MIN_VALUE;
+
+                        for (Cell cell : world.getCells())
+                        {
+                            if (cell != null && !cell.virus)
+                            {
+                                if (player.canEat(cell))
+                                {
+                                    short size = cell.size;
+
+                                    int score = (int) (size * 1000.0 / player.getDistance(cell));
+
+                                    if (score > highestScore)
+                                    {
+                                        eat = cell;
+                                        highestScore = score;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (eat != null)
+                        {
+                            world.setMove(eat.x - player.x, eat.y - player.y);
+                        }
+                    }
+                }
+            }
         }
     }
 }

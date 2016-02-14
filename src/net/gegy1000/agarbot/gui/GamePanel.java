@@ -106,10 +106,12 @@ public class GamePanel extends JPanel
         int actualX = cell.x;
         int actualY = cell.y;
 
-        int drawSize = cell.size * 2;
+        double zoom = game.world.zoom;
 
-        int relativeX = ((actualX - cameraX) + 500) - (drawSize / 2);
-        int relativeY = ((actualY - cameraY) + 400) - (drawSize / 2);
+        int drawSize = (int) ((cell.size * 2) * zoom);
+
+        int relativeX = (int) ((((actualX - cameraX) * zoom) + 500) - (drawSize / 2));
+        int relativeY = (int) ((((actualY - cameraY) * zoom) + 400) - (drawSize / 2));
 
         int red = cell.red;
         int green = cell.green;
@@ -134,7 +136,7 @@ public class GamePanel extends JPanel
 
             if (cell.size > 15)
             {
-                borderCenteredText(g, "" + (cell.size - 22), textX, textY + 15);
+                borderCenteredText(g, "" + (cell.getMass()), textX, textY + 15);
             }
         }
     }

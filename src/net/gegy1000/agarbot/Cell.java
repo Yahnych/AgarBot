@@ -55,4 +55,22 @@ public class Cell
 
         return name;
     }
+
+    public boolean canEat(Cell cell)
+    {
+        return ((float) size / (float) cell.size) * 100.0F > 125;
+    }
+
+    public double getDistance(Cell cell)
+    {
+        int distX = Math.abs(x - cell.x);
+        int distY = Math.abs(y - cell.y);
+
+        return Math.sqrt((distX * distX) + (distY * distY));
+    }
+
+    public int getMass()
+    {
+        return size * size / 100;
+    }
 }

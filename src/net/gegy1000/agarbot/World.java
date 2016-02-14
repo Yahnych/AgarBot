@@ -1,5 +1,6 @@
 package net.gegy1000.agarbot;
 
+import net.gegy1000.agarbot.gui.AgarBotFrame;
 import net.gegy1000.agarbot.network.packet.PacketServer0SetNick;
 import net.gegy1000.agarbot.network.packet.PacketServer16Move;
 import net.gegy1000.agarbot.network.packet.PacketServer17Split;
@@ -26,6 +27,9 @@ public class World
 
     public int level, exp, maxExp;
 
+    public double zoomm;
+    public double zoom;
+
     public World(Game game)
     {
         this.game = game;
@@ -33,7 +37,7 @@ public class World
 
     public List<Cell> getCells()
     {
-        return cells;
+        return new ArrayList<>(cells);
     }
 
     public void removeCells(List<Cell> toDestroy)
@@ -73,12 +77,15 @@ public class World
 
     public void setMove(float x, float y)
     {
-        if (moveX != x || moveY != y)
+        if (game.networkManager != null)
         {
-            this.moveX = x;
-            this.moveY = y;
+            if (moveX != x || moveY != y)
+            {
+                this.moveX = x;
+                this.moveY = y;
 
-            game.networkManager.sendPacketToServer(new PacketServer16Move(x, y));
+                game.networkManager.sendPacketToServer(new PacketServer16Move(x, y));
+            }
         }
     }
 
@@ -102,7 +109,7 @@ public class World
 
     public Cell getCellById(int id)
     {
-        for (Cell cell : new ArrayList<>(cells))
+        for (Cell cell : getCells())
         {
             if (cell != null && cell.id == id)
             {
@@ -145,5 +152,32 @@ public class World
     public void eject()
     {
         game.networkManager.sendPacketToServer(new PacketServer21EjectMass());
+    }
+
+    public void update()
+    {
+        int totalSize = 0;
+
+        for(Cell player : getPlayerCells())
+        {
+            if (player != null)
+            {
+                totalSize += player.size;
+            }
+        }
+
+        zoomm = AgarBotFrame.HEIGHT / (1024 / Math.pow(Math.min(64.0 / totalSize, 1), 0.4));
+
+        if(zoomm > 1)
+        {
+            zoomm=1;
+        }
+
+        if(zoomm == -1)
+        {
+            zoomm = zoom;
+        }
+
+        zoom += (zoomm - zoom) / 40f;
     }
 }

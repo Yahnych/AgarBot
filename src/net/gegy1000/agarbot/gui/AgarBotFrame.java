@@ -1,26 +1,26 @@
 package net.gegy1000.agarbot.gui;
 
 import net.gegy1000.agarbot.Game;
-import net.gegy1000.agarbot.Main;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class AgarBotFrame extends JFrame
 {
+    public static final int WIDTH = 1000;
+    public static final int HEIGHT = 800;
+
     private Game game;
 
     public AgarBotFrame(Game game)
     {
         this.game = game;
 
-        this.setSize(1000, 800);
+        this.setSize(WIDTH, HEIGHT);
         this.setTitle("agar.io bot - " + game.nick);
 
         this.setResizable(false);
@@ -64,13 +64,13 @@ public class AgarBotFrame extends JFrame
     {
         super.paint(g);
 
-        Point mouse = MouseInfo.getPointerInfo().getLocation();
-
-        if (mouse != null)
-        {
-            Point locationOnScreen = getLocationOnScreen();
-            game.world.setMove((mouse.x - locationOnScreen.x) - 500, (mouse.y - locationOnScreen.y) - 400);
-        }
+//        Point mouse = MouseInfo.getPointerInfo().getLocation();
+//
+//        if (mouse != null)
+//        {
+//            Point locationOnScreen = getLocationOnScreen();
+//            game.world.setMove((mouse.x - locationOnScreen.x) - 500, (mouse.y - locationOnScreen.y) - 400);
+//        }
 
         this.setVisible(true);
     }

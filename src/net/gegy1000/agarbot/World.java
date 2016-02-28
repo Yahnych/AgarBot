@@ -230,6 +230,11 @@ public class World
 
         if (playerCells.size() > 0)
         {
+            if (ticks % 100 == 0)
+            {
+                updateFitness();
+            }
+            
             int[] cameraPos = getCameraPos();
 
             cameraX = cameraPos[0];

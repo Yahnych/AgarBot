@@ -176,7 +176,7 @@ public class GamePanel extends JPanel
 
                         int colour = (int) ((inputs[baseIndex] + 1) * 127);
 
-                        drawNeuralInput(g, x, y, new Color(colour, colour, colour, 180));
+                        drawNeuralInput(g, x, y, new Color(colour, colour, colour, 32));
                     }
                 }
             }
@@ -185,14 +185,16 @@ public class GamePanel extends JPanel
 
     private void drawNeuralInput(Graphics2D g, int x, int y, Color color)
     {
-        x *= 5;
-        y *= 5;
+        int size = PlayerController.SIZE_DIVISOR;
 
-        x += 20;
-        y += 40;
+        x *= size;
+        y *= size;
+
+//        x += 20;
+//        y += 40;
 
         g.setColor(color);
-        g.fillRect(x, y, 5, 5);
+        g.fillRect(x, y, size, size);
     }
 
     private void drawCenteredString(Graphics2D g, String text, int x, int y)

@@ -254,7 +254,15 @@ public class PlayerController
                 {
                     drawX /= SIZE_DIVISOR;
                     drawY /= SIZE_DIVISOR;
-                    inputs[(drawY * inputWidth) + drawX] = input;
+
+                    int index = (drawY * inputWidth) + drawX;
+
+                    float existing = inputs[index];
+
+                    if (existing == 0 || (input < 0 ? input < existing : input > existing))
+                    {
+                        inputs[index] = input;
+                    }
                 }
             }
         }

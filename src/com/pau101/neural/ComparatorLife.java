@@ -8,6 +8,6 @@ import java.util.Comparator;
 public class ComparatorLife implements Comparator<Life> {
 	@Override
 	public int compare(Life a, Life b) {
-		return Long.compare(a.getFitness(), b.getFitness());
+		return Long.compare(b.getFitness(), a.getFitness());
 	}
 }

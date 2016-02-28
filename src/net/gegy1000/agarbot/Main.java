@@ -1,6 +1,7 @@
 package net.gegy1000.agarbot;
 
 import net.gegy1000.agarbot.api.GameMode;
+import net.gegy1000.agarbot.api.ServerData;
 import net.gegy1000.agarbot.api.ServerLocation;
 import net.gegy1000.agarbot.network.*;
 import net.gegy1000.agarbot.network.packet.*;
@@ -11,7 +12,7 @@ import java.util.List;
 public class Main
 {
     public static final String VERSION = "154669603";
-    private static final String NICK = "68565 Neurons";
+    private static final String NICK = "Learning Bot";
 
     public static List<Game> games = new ArrayList<Game>();
 
@@ -41,7 +42,7 @@ public class Main
         NetworkManager.registerServerPacket(254, PacketServer254Init1.class);
         NetworkManager.registerServerPacket(255, PacketServer255Init2.class);
 
-        Game mainGame = new Game(NICK, ServerLocation.LONDON, GameMode.FFA, true);
+        Game mainGame = new Game(NICK, ServerLocation.LONDON, GameMode.PARTY, true);
 
         games.add(mainGame);
 

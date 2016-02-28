@@ -55,7 +55,7 @@ public class GamePanel extends JPanel
                 @Override
                 public int compare(Cell cell1, Cell cell2)
                 {
-                    return cell1.renderSize - cell2.renderSize;
+                    return cell1 != null && cell2 != null ? cell1.renderSize - cell2.renderSize : -1;
                 }
             });
 
@@ -130,7 +130,10 @@ public class GamePanel extends JPanel
 
             for (Cell cell : cells)
             {
-                drawCell(smallestPlayer, cell, g, world.cameraX, world.cameraY, player.contains(cell));
+                if (cell != null)
+                {
+                    drawCell(smallestPlayer, cell, g, world.cameraX, world.cameraY, player.contains(cell));
+                }
             }
         }
 
@@ -161,6 +164,7 @@ public class GamePanel extends JPanel
             g.drawString("Generation: " + (controller.currentGeneration + 1), 10, 15);
             g.drawString("Highest Fitness: " + controller.highestFitness, 10, 30);
             g.drawString("Current Fitness: " + world.getFitness(), 20, 750);
+            g.drawString("Current Life: " + (controller.currentLifeIndex + 1), 900, 750);
             int width = controller.inputWidth;
             int height = controller.inputHeight;
 

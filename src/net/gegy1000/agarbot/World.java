@@ -4,7 +4,6 @@ import net.gegy1000.agarbot.gui.AgarBotFrame;
 import net.gegy1000.agarbot.network.packet.PacketServer0SetNick;
 import net.gegy1000.agarbot.network.packet.PacketServer16Move;
 import net.gegy1000.agarbot.network.packet.PacketServer17Split;
-import net.gegy1000.agarbot.network.packet.PacketServer20Explode;
 import net.gegy1000.agarbot.network.packet.PacketServer21EjectMass;
 
 import java.util.ArrayList;
@@ -236,19 +235,16 @@ public class World
             cameraX = cameraPos[0];
             cameraY = cameraPos[1];
 
-            if (ticks % 16000 == 0)
+            for (Cell cell : getCells())
             {
-                for (Cell cell : getCells())
+                if (cell != null)
                 {
-                    if (cell != null)
-                    {
-                        cell.update();
-                    }
+                    cell.update();
                 }
-
-                zoomm = AgarBotFrame.HEIGHT / (1024 / Math.pow(Math.min(64.0 / totalSize, 1), 0.4));
-                zoom += (zoomm - zoom) / 40f;
             }
+
+            zoomm = AgarBotFrame.HEIGHT / (1024 / Math.pow(Math.min(64.0 / totalSize, 1), 0.4));
+            zoom += (zoomm - zoom) / 40f;
 
             ticks++;
         }

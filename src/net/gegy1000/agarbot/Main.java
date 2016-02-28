@@ -11,7 +11,7 @@ import java.util.List;
 public class Main
 {
     public static final String VERSION = "154669603";
-    private static final String NICK = "5375721 Neurons";
+    private static final String NICK = "68565 Neurons";
 
     public static List<Game> games = new ArrayList<Game>();
 
@@ -60,11 +60,34 @@ public class Main
             }
         }).start();
 
+        double lastUpdated;
+        final double ns = 1000000000.0 / 100.0;
+        double delta = 0;
+        lastUpdated = System.nanoTime();
+        int updates = 0;
+        long timer = System.currentTimeMillis();
+
         while (true)
         {
-            for (Game game : games)
+            long now = System.nanoTime();
+            delta += (now - lastUpdated) / ns;
+            lastUpdated = now;
+
+            while(delta >= 1)
             {
-                game.update();
+                for (Game game : games)
+                {
+                    game.update();
+                }
+
+                updates++;
+                delta--;
+            }
+
+            if(System.currentTimeMillis() - timer > 1000)
+            {
+                timer += 1000;
+                updates = 0;
             }
         }
     }

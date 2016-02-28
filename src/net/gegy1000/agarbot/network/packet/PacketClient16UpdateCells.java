@@ -4,6 +4,8 @@ import net.gegy1000.agarbot.Cell;
 import net.gegy1000.agarbot.Main;
 import net.gegy1000.agarbot.network.AgarByteBuffer;
 
+import java.util.Arrays;
+
 public class PacketClient16UpdateCells extends PacketAgarBase
 {
     @Override
@@ -17,9 +19,9 @@ public class PacketClient16UpdateCells extends PacketAgarBase
     {
         short eats = buffer.readShort();
 
-        for(int i = 0; i < eats; i++)
+        for (int i = 0; i < eats; i++)
         {
-            int eaten = buffer.readInteger();
+            int eater = buffer.readInteger();
             int victim = buffer.readInteger();
 
             game.world.removeCell(victim);
@@ -34,70 +36,46 @@ public class PacketClient16UpdateCells extends PacketAgarBase
 
             short size = buffer.readShort();
 
-            byte red = buffer.readByte();
-            byte green = buffer.readByte();
-            byte blue = buffer.readByte();
+            byte r = buffer.readByte();
+            byte g = buffer.readByte();
+            byte b = buffer.readByte();
 
             byte flags = buffer.readByte();
 
             boolean isVirus = getFlag(flags, 1);
-            boolean isAgitated = getFlag(flags, 16); //What does this do?
+            boolean isAgitated = getFlag(flags, 16);
 
-            int skips = 0;
-
-            if (getFlag(flags, (byte) 2))
+            if (getFlag(flags, 0b10))
             {
-                skips += 4;
+                buffer.incrementIndex(4 + buffer.readInteger());
             }
 
-            if (getFlag(flags, (byte) 4))
+            String skin = "";
+
+            if (getFlag(flags, 0b100))
             {
-                String str = "";
-
-                byte c;
-
-                while ((c = buffer.readByte()) != 0)
-                {
-                    str += (char) c;
-                }
-
-                System.out.println("Skin: " + str);
+                skin = buffer.readNullStr8();
             }
 
-            if (getFlag(flags, (byte) 8))
-            {
-                skips += 16;
-            }
-
-            buffer.incrementIndex(skips);
-
-            String name = "";
-
-            short c;
-
-            while ((c = buffer.readShort()) != 0)
-            {
-                name += (char) c;
-            }
+            String name = buffer.readNullStr16();
 
             Cell cell = game.world.getCellById(id);
 
             if (cell == null)
             {
-                cell = new Cell(game, name, id, x, y, size);
-                cell.setColour(red, green, blue);
+                cell = new Cell(game, name, id, x, y, size, skin);
+                cell.setColour(r, g, b);
                 cell.virus = isVirus;
 
                 game.world.addCell(cell);
             }
             else
             {
-//                cell.name = name;
-                cell.x = x;
-                cell.y = y;
+                cell.skin = skin;
+                cell.setPosition(x, y);
                 cell.size = size;
                 cell.virus = isVirus;
-                cell.setColour(red, green, blue);
+                cell.setColour(r, g, b);
             }
         }
 
@@ -107,18 +85,13 @@ public class PacketClient16UpdateCells extends PacketAgarBase
 
             for (int i = 0; i < removals; i++)
             {
-                if (!buffer.hasNext(4))
-                {
-                    break;
-                }
-
                 game.world.removeCell(buffer.readInteger());
             }
         }
     }
 
-    private boolean getFlag(byte flags, int index)
+    private boolean getFlag(byte flags, int modifier)
     {
-        return (flags & index) == 1;
+        return (flags & modifier) == modifier;
     }
 }

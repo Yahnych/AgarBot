@@ -7,6 +7,7 @@ import net.gegy1000.agarbot.gui.AgarBotFrame;
 import net.gegy1000.agarbot.network.NetworkManager;
 
 import javax.swing.JFrame;
+import java.io.IOException;
 import java.util.List;
 
 public class Game
@@ -16,22 +17,43 @@ public class Game
 
     public String nick;
 
+    public PlayerController controller;
+
+    public ServerData serverData;
+
+    public ServerLocation serverLocation;
+    public GameMode gameMode;
+
+    public AgarBotFrame frame;
+
     public Game(String nick, ServerLocation serverLocation, GameMode mode, boolean openWindow) throws Exception
     {
         this(nick, openWindow);
         this.networkManager = NetworkManager.create(this, serverLocation, mode);
+        this.serverLocation = serverLocation;
+        this.gameMode = mode;
     }
 
     public Game(String nick, ServerData serverData, boolean openWindow) throws Exception
     {
         this(nick, openWindow);
         this.networkManager = NetworkManager.create(this, serverData);
+        setServerData();
     }
 
     private Game(String nick, boolean openWindow)
     {
         this.world = new World(this);
         this.nick = nick;
+
+        try
+        {
+            this.controller = new PlayerController(this);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
 
         if (openWindow)
         {
@@ -40,7 +62,8 @@ public class Game
                 @Override
                 public void run()
                 {
-                    JFrame frame = new AgarBotFrame(Game.this);
+                    AgarBotFrame frame = new AgarBotFrame(Game.this);
+                    Game.this.frame = frame;
                     frame.setVisible(true);
 
                     while (true)
@@ -52,52 +75,43 @@ public class Game
         }
     }
 
+    private void setServerData()
+    {
+        this.serverData = new ServerData(networkManager.ip, networkManager.token);
+    }
+
     public void update()
     {
         if (networkManager.isOpen)
         {
             world.update();
+        }
+    }
 
-            if (world.playerIds.size() > 0)
-            {
-                List<Cell> playerCells = world.getPlayerCells();
+    public void controlUpdate()
+    {
+        if (networkManager.isOpen)
+        {
+            controller.tick(this);
+        }
+    }
 
-                if (playerCells.size() > 0)
-                {
-                    Cell player = playerCells.get(0);
+    public void rejoin() throws Exception
+    {
+        if (networkManager.isOpen)
+        {
+            networkManager.close();
+        }
 
-                    if (player != null)
-                    {
-                        Cell eat = null;
+        world.playerDeath();
 
-                        int highestScore = Integer.MIN_VALUE;
-
-                        for (Cell cell : world.getCells())
-                        {
-                            if (cell != null && !cell.virus)
-                            {
-                                if (player.canEat(cell))
-                                {
-                                    short size = cell.size;
-
-                                    int score = (int) (size * 1000.0 / player.getDistance(cell));
-
-                                    if (score > highestScore)
-                                    {
-                                        eat = cell;
-                                        highestScore = score;
-                                    }
-                                }
-                            }
-                        }
-
-                        if (eat != null)
-                        {
-                            world.setMove(eat.x - player.x, eat.y - player.y);
-                        }
-                    }
-                }
-            }
+        if (serverData != null)
+        {
+            networkManager = NetworkManager.create(this, serverData);
+        }
+        else
+        {
+            networkManager = NetworkManager.create(this, serverLocation, gameMode);
         }
     }
 }

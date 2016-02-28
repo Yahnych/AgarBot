@@ -1,6 +1,5 @@
 package net.gegy1000.agarbot.network.packet;
 
-import net.gegy1000.agarbot.Main;
 import net.gegy1000.agarbot.network.AgarByteBuffer;
 
 public class PacketClient49LeaderboardUpdate extends PacketAgarBase
@@ -14,22 +13,13 @@ public class PacketClient49LeaderboardUpdate extends PacketAgarBase
 
         for (int i = 0; i < size; i++)
         {
-            String nick = "";
+            int minimumBlobId = buffer.readInteger();
 
-            short charShort;
+            String nick = buffer.readNullStr16();
 
-            while ((charShort = buffer.readShort()) != 0)
-            {
-                nick += (char) charShort;
-            }
-
-            if (nick.length() <= 2)
+            if (nick.length() == 0)
             {
                 nick = "An unnamed cell";
-            }
-            else
-            {
-                nick = nick.substring(2);
             }
 
             leaderboard[i] = nick;

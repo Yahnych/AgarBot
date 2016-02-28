@@ -22,6 +22,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -147,7 +148,7 @@ public class NetworkManager extends WebSocketClient
     @Override
     public void onOpen(ServerHandshake serverHandshake)
     {
-        System.out.println("Connected to " + uri + " with token " + token + " and nickname " + game.nick);
+        System.out.println("Connected to " + uri + " (" + game.serverLocation + ") with token \"" + token + "\" and nickname \"" + game.nick + "\" on gamemode " + game.gameMode);
 
         isOpen = true;
 
@@ -175,12 +176,22 @@ public class NetworkManager extends WebSocketClient
 
         try
         {
-            PacketAgarBase packet = NetworkManager.getClientPacketForId(id).getDeclaredConstructor().newInstance();
-            packet.setGame(game);
-            packet.receive(buffer);
+            Class<? extends PacketAgarBase> packetWithId = NetworkManager.getClientPacketForId(id);
+
+            if (packetWithId != null)
+            {
+                PacketAgarBase packet = packetWithId.getDeclaredConstructor().newInstance();
+                packet.setGame(game);
+                packet.receive(buffer);
+            }
+            else
+            {
+                System.err.println("Received unknown packet " + id + "! Data: " + Arrays.toString(buffer.toBytes()));
+            }
         }
         catch (Exception e)
         {
+            System.err.println("Error while receiving packet " + id);
             e.printStackTrace();
         }
     }
@@ -192,7 +203,14 @@ public class NetworkManager extends WebSocketClient
 
         isOpen = false;
 
-        System.exit(-1);
+        try
+        {
+            game.rejoin();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override

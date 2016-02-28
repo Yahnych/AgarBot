@@ -1,20 +1,17 @@
 package net.gegy1000.agarbot;
 
 import net.gegy1000.agarbot.api.GameMode;
-import net.gegy1000.agarbot.api.ServerData;
 import net.gegy1000.agarbot.api.ServerLocation;
-import net.gegy1000.agarbot.gui.AgarBotFrame;
 import net.gegy1000.agarbot.network.*;
 import net.gegy1000.agarbot.network.packet.*;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main
 {
     public static final String VERSION = "154669603";
-    private static final String NICK = "NotABot";
+    private static final String NICK = "5375721 Neurons";
 
     public static List<Game> games = new ArrayList<Game>();
 
@@ -22,7 +19,10 @@ public class Main
     {
         // Client
         NetworkManager.registerClientPacket(16, PacketClient16UpdateCells.class);
-        NetworkManager.registerClientPacket(20, PacketClient20ResetLevel.class);
+        NetworkManager.registerClientPacket(17, PacketClient17SpectateUpdate.class);
+        NetworkManager.registerClientPacket(18, PacketClient18ResetControllers.class);
+        NetworkManager.registerClientPacket(20, PacketClient20Reset.class);
+        NetworkManager.registerClientPacket(21, PacketClient21DrawDebugLine.class);
         NetworkManager.registerClientPacket(32, PacketClient32AddPlayerNode.class);
         NetworkManager.registerClientPacket(49, PacketClient49LeaderboardUpdate.class);
         NetworkManager.registerClientPacket(64, PacketClient64MapSize.class);
@@ -41,9 +41,24 @@ public class Main
         NetworkManager.registerServerPacket(254, PacketServer254Init1.class);
         NetworkManager.registerServerPacket(255, PacketServer255Init2.class);
 
-        Game mainGame = new Game(NICK, ServerLocation.LONDON, GameMode.PARTY, true);
+        Game mainGame = new Game(NICK, ServerLocation.LONDON, GameMode.FFA, true);
 
         games.add(mainGame);
+
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                while (true)
+                {
+                    for (Game game : games)
+                    {
+                        game.controlUpdate();
+                    }
+                }
+            }
+        }).start();
 
         while (true)
         {

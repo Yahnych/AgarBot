@@ -74,6 +74,34 @@ public class AgarByteBuffer
         return bytes;
     }
 
+    public void writeNullStr16(String str)
+    {
+        writeEndStr16(str);
+        writeShort((short) 0);
+    }
+
+    public void writeEndStr16(String str)
+    {
+        for (char c : str.toCharArray())
+        {
+            writeShort((short) c);
+        }
+    }
+
+    public void writeNullStr8(String str)
+    {
+        writeEndStr8(str);
+        writeByte((byte) 0);
+    }
+
+    public void writeEndStr8(String str)
+    {
+        for (char c : str.toCharArray())
+        {
+            writeByte((byte) c);
+        }
+    }
+
     public int readInteger()
     {
         return ByteBuffer.wrap(readBytes(4)).order(ByteOrder.LITTLE_ENDIAN).getInt();
@@ -92,6 +120,58 @@ public class AgarByteBuffer
     public short readShort()
     {
         return ByteBuffer.wrap(readBytes(2)).order(ByteOrder.LITTLE_ENDIAN).getShort();
+    }
+
+    public String readNullStr16()
+    {
+        String str = "";
+
+        short c;
+
+        while ((c = readShort()) != 0)
+        {
+            str += (char) c;
+        }
+
+        return str;
+    }
+
+    public String readEndStr16()
+    {
+        String str = "";
+
+        while (hasNext(2))
+        {
+            str += (char) readShort();
+        }
+
+        return str;
+    }
+
+    public String readNullStr8()
+    {
+        String str = "";
+
+        byte c;
+
+        while ((c = readByte()) != 0)
+        {
+            str += (char) c;
+        }
+
+        return str;
+    }
+
+    public String readEndStr8()
+    {
+        String str = "";
+
+        while (hasNext(1))
+        {
+            str += (char) readByte();
+        }
+
+        return str;
     }
 
     public void resetIndex()
@@ -126,5 +206,10 @@ public class AgarByteBuffer
     public boolean hasNext(int count)
     {
         return index + count < bytes.length;
+    }
+
+    public int amountLeft()
+    {
+        return bytes.length - index;
     }
 }

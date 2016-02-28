@@ -4,10 +4,10 @@ import net.gegy1000.agarbot.network.AgarByteBuffer;
 
 public class PacketServer16Move extends PacketAgarBase
 {
-    private float x;
-    private float y;
+    private int x;
+    private int y;
 
-    public PacketServer16Move(float x, float y)
+    public PacketServer16Move(int x, int y)
     {
         this.x = x;
         this.y = y;
@@ -16,8 +16,8 @@ public class PacketServer16Move extends PacketAgarBase
     @Override
     public byte[] send(AgarByteBuffer buffer)
     {
-        buffer.writeFloat(x);
-        buffer.writeFloat(y);
+        buffer.writeInteger(x);
+        buffer.writeInteger(y);
         buffer.writeInteger(0); // id
 
         return super.send(buffer);

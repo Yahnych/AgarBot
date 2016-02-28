@@ -15,35 +15,10 @@ public class PacketServer80SendToken extends PacketAgarBase
         this.token = token;
     }
 
-    public byte[] nameBytes()
-    {
-        byte[] charArray;
-
-        try
-        {
-            charArray = this.token.getBytes("UTF-8");
-            byte[] bytes = new byte[charArray.length];
-            ByteBuffer buffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
-
-            for(byte c : charArray)
-            {
-                buffer.put(c);
-            }
-
-            return bytes;
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
     @Override
     public byte[] send(AgarByteBuffer buffer)
     {
-        buffer.writeBytes(nameBytes());
+        buffer.writeEndStr8(token);
 
         return super.send(buffer);
     }

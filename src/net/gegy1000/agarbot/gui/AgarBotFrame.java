@@ -6,8 +6,6 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 public class AgarBotFrame extends JFrame
 {
@@ -15,6 +13,8 @@ public class AgarBotFrame extends JFrame
     public static final int HEIGHT = 800;
 
     private Game game;
+
+    public GamePanel panel;
 
     public AgarBotFrame(Game game)
     {
@@ -27,36 +27,39 @@ public class AgarBotFrame extends JFrame
 
         this.setLocation(0, 0);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        this.add(new GamePanel(game));
-        this.setBackground(Color.BLACK);
+        GamePanel panel = new GamePanel(game);
+        this.add(panel);
 
-        addKeyListener(new KeyListener()
-        {
-            @Override
-            public void keyTyped(KeyEvent e)
-            {
+        this.panel = panel;
+        this.setBackground(new Color(10, 10, 10));
 
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e)
-            {
-                if (e.getKeyChar() == ' ')
-                {
-                    game.world.split();
-                }
-                else if (e.getKeyChar() == 'w')
-                {
-                    game.world.eject();
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e)
-            {
-
-            }
-        });
+//        addKeyListener(new KeyListener()
+//        {
+//            @Override
+//            public void keyTyped(KeyEvent e)
+//            {
+//
+//            }
+//
+//            @Override
+//            public void keyPressed(KeyEvent e)
+//            {
+//                if (e.getKeyChar() == ' ')
+//                {
+//                    game.world.split();
+//                }
+//                else if (e.getKeyChar() == 'w')
+//                {
+//                    game.world.eject();
+//                }
+//            }
+//
+//            @Override
+//            public void keyReleased(KeyEvent e)
+//            {
+//
+//            }
+//        });
     }
 
     @Override

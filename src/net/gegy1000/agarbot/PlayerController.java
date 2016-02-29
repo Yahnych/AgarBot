@@ -140,72 +140,56 @@ public class PlayerController
 
     public float[] getInputs(Game game)
     {
-        float[] inputs = new float[getInputCount()];
-
-        World world = game.world;
-        List<Cell> player = world.getPlayerCells();
-
-        if (player.size() > 0)
+        try
         {
-            ArrayList<Cell> cells = new ArrayList<Cell>(world.cells);
-            cells.sort(new Comparator<Cell>()
-            {
-                @Override
-                public int compare(Cell cell1, Cell cell2)
-                {
-                    return cell1 != null && cell2 != null ? cell1.renderSize - cell2.renderSize : -1;
-                }
-            });
+            float[] inputs = new float[getInputCount()];
 
-            int smallestPlayerSize = Integer.MAX_VALUE;
-            Cell smallestPlayer = null;
+            World world = game.world;
+            List<Cell> player = world.getPlayerCells();
 
-            for (Cell p : player)
+            if (player.size() > 0)
             {
-                if (p != null)
+                ArrayList<Cell> cells = new ArrayList<Cell>(world.cells);
+                cells.sort(new Comparator<Cell>()
                 {
-                    if (p.size < smallestPlayerSize)
+                    @Override
+                    public int compare(Cell cell1, Cell cell2)
                     {
-                        smallestPlayer = p;
-                        smallestPlayerSize = p.size;
+                        return cell1 != null && cell2 != null ? cell1.renderSize - cell2.renderSize : -1;
+                    }
+                });
+
+                int smallestPlayerSize = Integer.MAX_VALUE;
+                Cell smallestPlayer = null;
+
+                for (Cell p : player)
+                {
+                    if (p != null)
+                    {
+                        if (p.size < smallestPlayerSize)
+                        {
+                            smallestPlayer = p;
+                            smallestPlayerSize = p.size;
+                        }
+                    }
+                }
+
+                for (Cell cell : cells)
+                {
+                    if (cell != null)
+                    {
+                        inputs = drawCell(game, smallestPlayer, cell, player.contains(cell), inputs);
                     }
                 }
             }
 
-            for (Cell cell : cells)
-            {
-                if (cell != null)
-                {
-                    inputs = drawCell(game, smallestPlayer, cell, player.contains(cell), inputs);
-                }
-            }
+            return inputs;
         }
-
-//        for (int y = 0; y < inputHeight; y++)
-//        {
-//            for (int x = 0; x < inputWidth; x++)
-//            {
-//                int rgb = img.getRGB(x * widthRatio, y * heightRatio);
-//
-//                if (rgb != 0)
-//                {
-//                    int colour = rgb & 0xFF;
-//
-//                    if (colour == 1)
-//                    {
-//                        colour = 0;
-//                    }
-//                    else if (colour == 0)
-//                    {
-//                        colour = 128;
-//                    }
-//
-//                    inputs[(y * inputWidth) + x] = (colour - 128) / 128.0F;
-//                }
-//            }
-//        }
-
-        return inputs;
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return inputs;
+        }
     }
 
     public float[] drawCell(Game game, Cell smallestPlayer, Cell cell, boolean isPlayer, float[] inputs)

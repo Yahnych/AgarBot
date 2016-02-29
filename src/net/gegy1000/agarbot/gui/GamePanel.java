@@ -55,7 +55,7 @@ public class GamePanel extends JPanel
                 @Override
                 public int compare(Cell cell1, Cell cell2)
                 {
-                    return cell1 != null && cell2 != null ? cell1.renderSize - cell2.renderSize : -1;
+                    return cell1.renderSize - cell2.renderSize;
                 }
             });
 

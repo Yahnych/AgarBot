@@ -309,7 +309,7 @@ public class World
 
     public long getFitness()
     {
-        return fitness;
+        return getScore(); //fitness
     }
 
     public int[] getCameraPos()

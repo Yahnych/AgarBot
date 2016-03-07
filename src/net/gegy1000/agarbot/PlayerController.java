@@ -155,7 +155,7 @@ public class PlayerController
                     @Override
                     public int compare(Cell cell1, Cell cell2)
                     {
-                        return cell1 != null && cell2 != null ? cell1.renderSize - cell2.renderSize : -1;
+                        return cell1.renderSize - cell2.renderSize;
                     }
                 });
 
@@ -340,7 +340,7 @@ public class PlayerController
 
         if (world.isDead)
         {
-            long fitness = world.getFitness();
+            long fitness = world.getScore();
 
             currentLife.setFitness(fitness);
 

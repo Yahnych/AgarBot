@@ -42,7 +42,7 @@ public class Main
         NetworkManager.registerServerPacket(254, PacketServer254Init1.class);
         NetworkManager.registerServerPacket(255, PacketServer255Init2.class);
 
-        Game mainGame = new Game(NICK, ServerLocation.LONDON, GameMode.PARTY, true);
+        Game mainGame = new Game(NICK, ServerLocation.LONDON, GameMode.FFA, true);
 
         games.add(mainGame);
 

@@ -1,10 +1,28 @@
 package net.gegy1000.agarbot;
 
-import net.gegy1000.agarbot.api.GameMode;
 import net.gegy1000.agarbot.api.ServerData;
-import net.gegy1000.agarbot.api.ServerLocation;
-import net.gegy1000.agarbot.network.*;
-import net.gegy1000.agarbot.network.packet.*;
+import net.gegy1000.agarbot.network.NetworkManager;
+import net.gegy1000.agarbot.network.packet.PacketClient16UpdateCells;
+import net.gegy1000.agarbot.network.packet.PacketClient17SpectateUpdate;
+import net.gegy1000.agarbot.network.packet.PacketClient18ResetControllers;
+import net.gegy1000.agarbot.network.packet.PacketClient20Reset;
+import net.gegy1000.agarbot.network.packet.PacketClient21DrawDebugLine;
+import net.gegy1000.agarbot.network.packet.PacketClient32AddPlayerNode;
+import net.gegy1000.agarbot.network.packet.PacketClient49LeaderboardUpdate;
+import net.gegy1000.agarbot.network.packet.PacketClient64MapSize;
+import net.gegy1000.agarbot.network.packet.PacketClient81Exp;
+import net.gegy1000.agarbot.network.packet.PacketServer0SetNick;
+import net.gegy1000.agarbot.network.packet.PacketServer16Move;
+import net.gegy1000.agarbot.network.packet.PacketServer17Split;
+import net.gegy1000.agarbot.network.packet.PacketServer18QPress;
+import net.gegy1000.agarbot.network.packet.PacketServer19QRelease;
+import net.gegy1000.agarbot.network.packet.PacketServer1Spectate;
+import net.gegy1000.agarbot.network.packet.PacketServer20Explode;
+import net.gegy1000.agarbot.network.packet.PacketServer21EjectMass;
+import net.gegy1000.agarbot.network.packet.PacketServer254Init1;
+import net.gegy1000.agarbot.network.packet.PacketServer255Init2;
+import net.gegy1000.agarbot.network.packet.PacketServer80SendToken;
+import net.gegy1000.agarbot.network.packet.PacketServer82Login;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +30,7 @@ import java.util.List;
 public class Main
 {
     public static final String VERSION = "154669603";
-    private static final String NICK = "Learning Bot";
+    private static final String NICK = "Bot";
 
     public static List<Game> games = new ArrayList<Game>();
 
@@ -39,12 +57,18 @@ public class Main
         NetworkManager.registerServerPacket(20, PacketServer20Explode.class);
         NetworkManager.registerServerPacket(21, PacketServer21EjectMass.class);
         NetworkManager.registerServerPacket(80, PacketServer80SendToken.class);
+        NetworkManager.registerServerPacket(82, PacketServer82Login.class);
         NetworkManager.registerServerPacket(254, PacketServer254Init1.class);
         NetworkManager.registerServerPacket(255, PacketServer255Init2.class);
 
-        Game mainGame = new Game(NICK, ServerLocation.LONDON, GameMode.FFA, true);
+        ServerData serverData = new ServerData("127.0.0.1:10101", "");
 
-        games.add(mainGame);
+        for (int i = 0; i < 100; i++)
+        {
+            games.add(new Game(NICK + " " + i, serverData, i == 0));
+        }
+
+        PlayerController.init();
 
         new Thread(new Runnable()
         {

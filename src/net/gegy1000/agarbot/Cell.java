@@ -68,6 +68,11 @@ public class Cell
 
     public boolean canEat(Cell cell)
     {
+        if (virus || cell.virus)
+        {
+            return virus;
+        }
+
         return ((float) size / (float) cell.size) * 100.0F >= 125;
     }
 
@@ -109,9 +114,7 @@ public class Cell
 
         if (size != renderSize)
         {
-            double diff = size - renderSize;
-
-            renderSize += (int) Math.min(Math.max(diff / 16.0, -1.0), 1.0);
+            renderSize -= (renderSize - size) / 9.0F;
         }
     }
 }

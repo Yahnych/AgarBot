@@ -4,13 +4,8 @@ import com.pau101.neural.ComparatorLife;
 import com.pau101.neural.Life;
 import com.pau101.neural.NeuralNet;
 import net.gegy1000.agarbot.gui.AgarBotFrame;
-import net.gegy1000.agarbot.gui.GamePanel;
 import net.gegy1000.agarbot.neural.save.NeuralNetSave;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,24 +19,23 @@ import java.util.Random;
  */
 public class PlayerController
 {
-    public Life[] lifePool;
-    public int currentGeneration;
-    public long highestFitness;
-    public Life currentLife;
-    public int currentLifeIndex;
-    public int[] layerSizes;
+    public static List<Life> lifePool = new ArrayList<>();
+    public static long highestFitness;
+    public static int[] layerSizes;
+    public static int inputCount;
+    public static int outputCount;
+
+    public Life life;
 
     public float[] inputs;
     public float[] outputs;
 
-    public Random rng = new Random();
-
-    public NeuralNet currentNeuralNet;
-
-    public int inputWidth = AgarBotFrame.WIDTH / SIZE_DIVISOR;
-    public int inputHeight = AgarBotFrame.HEIGHT / SIZE_DIVISOR;
+    public static Random rng = new Random();
 
     public static final int SIZE_DIVISOR = 50;
+
+    public static int inputWidth = AgarBotFrame.WIDTH / SIZE_DIVISOR;
+    public static int inputHeight = AgarBotFrame.HEIGHT / SIZE_DIVISOR;
 
     private static final ComparatorLife LIFE_MOST_FIT_COMPARATOR = new ComparatorLife();
 
@@ -49,26 +43,14 @@ public class PlayerController
 
     public static final File SAVE_FILE = new File("net/neural_net.nnet");
 
-    private int tick;
+    public static NeuralNetSave save;
 
-    private NeuralNetSave save;
-
-    public PlayerController(Game game) throws IOException
+    public static void init()
     {
-        if (SAVE_FILE.exists())
+        try
         {
-            save = NeuralNetSave.construct(SAVE_FILE, this);
-            save.read(game);
-        }
-        else
-        {
-            save = NeuralNetSave.construct(SAVE_FILE, this);
-
-            initInputs();
-            initOutputs();
-
-            int inputCount = getInputCount();
-            int outputCount = getOutputCount();
+            inputCount = inputWidth * inputHeight;
+            outputCount = 4;
 
             int hiddenLayerCount = (int) (Math.log((inputCount / outputCount)) / Math.log(2.0)) - 1;
             layerSizes = new int[hiddenLayerCount + 1];
@@ -84,24 +66,42 @@ public class PlayerController
                 prevSize = size;
             }
 
-            lifePool = new Life[20];
-
-            for (int i = 0; i < lifePool.length; i++)
+            for (int i = 0; i < 10; i++)
             {
-                lifePool[i] = new Life(NeuralNet.createRandom(layerSizes, inputCount));
+                lifePool.add(new Life(NeuralNet.createRandom(layerSizes, inputCount)));
             }
 
-            currentLifeIndex = 0;
-            currentGeneration = 0;
-            highestFitness = -1;
+            List<Game> games = Main.games;
 
-            initializeRun(game);
+            for (Game game : games)
+            {
+                PlayerController controller = new PlayerController();
+                controller.updateLife();
+                controller.initInputs();
+                controller.initOutputs();
+                controller.initializeRun(game);
+                game.controller = controller;
+            }
+
+            if (SAVE_FILE.exists())
+            {
+                save = NeuralNetSave.construct(SAVE_FILE);
+                save.read();
+            }
+            else
+            {
+                save = NeuralNetSave.construct(SAVE_FILE);
+
+                SAVE_FILE.getParentFile().mkdirs();
+                SAVE_FILE.createNewFile();
+
+                save.save();
+            }
         }
-    }
-
-    public PlayerController(Game game, int currentGeneration, long highestFitness, int lifeIndex, int[] layerSizes, Life[] lifePool)
-    {
-        load(game, currentGeneration, highestFitness, lifeIndex, layerSizes, lifePool);
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void initInputs()
@@ -128,21 +128,11 @@ public class PlayerController
         outputs = new float[4];
     }
 
-    public int getInputCount()
-    {
-        return inputs.length;
-    }
-
-    public int getOutputCount()
-    {
-        return outputs.length;
-    }
-
     public float[] getInputs(Game game)
     {
         try
         {
-            float[] inputs = new float[getInputCount()];
+            float[] inputs = new float[inputCount];
 
             World world = game.world;
             List<Cell> player = world.getPlayerCells();
@@ -305,27 +295,38 @@ public class PlayerController
         return layer;
     }
 
-    private void createNewGeneration()
-    {
-        Arrays.sort(lifePool, LIFE_MOST_FIT_COMPARATOR);
-
-        for (int i = lifePool.length / 2; i < lifePool.length; i++)
-        {
-            Life a = lifePool[rng.nextInt(lifePool.length / 2)];
-            Life b = lifePool[rng.nextInt(lifePool.length / 2)];
-            NeuralNet recombinant = a.getNeuralNet().crossover(b.getNeuralNet());
-            recombinant.mutate();
-            lifePool[i] = new Life(recombinant);
-        }
-
-        currentGeneration++;
-    }
 
     private void updateLife()
     {
-        currentLife = lifePool[currentLifeIndex];
+        Life a = lifePool.get(rng.nextInt(lifePool.size()));
+        Life b = lifePool.get(rng.nextInt(lifePool.size()));
+        NeuralNet recombinant = a.getNeuralNet().crossover(b.getNeuralNet());
+        recombinant.mutate();
+        life = new Life(recombinant);
 
-        currentNeuralNet = currentLife.getNeuralNet();
+        try
+        {
+            if (save != null)
+            {
+                save.save();
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void addLifeToPool(Life life)
+    {
+        lifePool.sort(LIFE_MOST_FIT_COMPARATOR);
+
+        if (life.getFitness() > lifePool.get(lifePool.size() - 1).getFitness())
+        {
+            lifePool.add(life);
+            lifePool.sort(LIFE_MOST_FIT_COMPARATOR);
+            lifePool.remove(lifePool.size() - 1);
+        }
     }
 
     public void tick(Game game)
@@ -333,7 +334,7 @@ public class PlayerController
         if (firstTick)
         {
             firstTick = false;
-            currentLife.setFitness(0);
+            life.setFitness(0);
         }
 
         World world = game.world;
@@ -342,31 +343,24 @@ public class PlayerController
         {
             long fitness = world.getScore();
 
-            currentLife.setFitness(fitness);
+            life.setFitness(fitness);
 
             if (fitness > highestFitness)
             {
                 highestFitness = fitness;
             }
 
-            System.out.println("Generation: " + (currentGeneration + 1) + ", Life: " + currentLife + ", Fitness: " + fitness + ", Highest Fitness: " + highestFitness);
+            addLifeToPool(life);
+            updateLife();
 
-            if (currentLifeIndex == lifePool.length - 1)
-            {
-                createNewGeneration();
-                currentLifeIndex = lifePool.length / 2 + 1;
-            }
-            else
-            {
-                currentLifeIndex++;
-            }
+            System.out.println("Life: " + life + ", Fitness: " + fitness + ", Highest Fitness: " + highestFitness);
 
             initializeRun(game);
         }
         else
         {
             inputs = getInputs(game);
-            float[] outputs = evaluate(inputs, currentNeuralNet);
+            float[] outputs = evaluate(inputs, life.getNeuralNet());
 
             float mouseX = outputs[0];
             float mouseY = outputs[1];
@@ -385,27 +379,10 @@ public class PlayerController
 
             world.setMove((int) (mouseX * 400), (int) (mouseY * 400));
         }
-
-        tick++;
     }
 
     public void initializeRun(Game game)
     {
-        try
-        {
-            if (!SAVE_FILE.exists())
-            {
-                SAVE_FILE.getParentFile().mkdirs();
-                SAVE_FILE.createNewFile();
-            }
-
-            save.save();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
         updateLife();
         firstTick = true;
         Arrays.fill(outputs, 0);
@@ -417,19 +394,5 @@ public class PlayerController
         {
             world.respawn();
         }
-    }
-
-    public void load(Game game, int currentGeneration, long highestFitness, int currentLifeIndex, int[] layerSizes, Life[] lifePool)
-    {
-        initInputs();
-        initOutputs();
-
-        this.currentGeneration = currentGeneration;
-        this.highestFitness = highestFitness;
-        this.currentLifeIndex = currentLifeIndex;
-        this.layerSizes = layerSizes;
-        this.lifePool = lifePool;
-
-        initializeRun(game);
     }
 }

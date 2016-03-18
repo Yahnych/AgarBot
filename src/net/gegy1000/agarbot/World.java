@@ -1,10 +1,12 @@
 package net.gegy1000.agarbot;
 
+import net.gegy1000.agarbot.api.LoginType;
 import net.gegy1000.agarbot.gui.AgarBotFrame;
 import net.gegy1000.agarbot.network.packet.PacketServer0SetNick;
 import net.gegy1000.agarbot.network.packet.PacketServer16Move;
 import net.gegy1000.agarbot.network.packet.PacketServer17Split;
 import net.gegy1000.agarbot.network.packet.PacketServer21EjectMass;
+import net.gegy1000.agarbot.network.packet.PacketServer82Login;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,10 +92,10 @@ public class World
 
         if (player.size() > 0)
         {
-            int[] avg = getCameraPos();
+            int[] cameraPos = getCameraPos();
 
-            x += avg[0];
-            y += avg[1];
+            x += cameraPos[0];
+            y += cameraPos[1];
 
             if (game.networkManager != null)
             {
@@ -210,6 +212,11 @@ public class World
     public void eject()
     {
         game.networkManager.sendPacketToServer(new PacketServer21EjectMass());
+    }
+
+    public void authenticate(LoginType loginType, String token)
+    {
+        game.networkManager.sendPacketToServer(new PacketServer82Login(loginType, token));
     }
 
     public void update()

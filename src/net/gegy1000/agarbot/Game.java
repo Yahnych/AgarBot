@@ -46,15 +46,6 @@ public class Game
         this.world = new World(this);
         this.nick = nick;
 
-        try
-        {
-            this.controller = new PlayerController(this);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
         if (openWindow)
         {
             new Thread(new Runnable()
@@ -92,7 +83,10 @@ public class Game
     {
         if (networkManager.isOpen)
         {
-            controller.tick(this);
+            if (controller != null)
+            {
+                controller.tick(this);
+            }
         }
     }
 

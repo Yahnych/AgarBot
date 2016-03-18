@@ -161,12 +161,10 @@ public class GamePanel extends JPanel
 
         if (controller != null)
         {
-            g.drawString("Generation: " + (controller.currentGeneration + 1), 10, 15);
-            g.drawString("Highest Fitness: " + controller.highestFitness, 10, 30);
+            g.drawString("Highest Fitness: " + PlayerController.highestFitness, 10, 30);
             g.drawString("Current Fitness: " + world.getFitness(), 20, 750);
-            g.drawString("Current Life: " + (controller.currentLifeIndex + 1), 900, 750);
-            int width = controller.inputWidth;
-            int height = controller.inputHeight;
+            int width = PlayerController.inputWidth;
+            int height = PlayerController.inputHeight;
 
             float[] inputs = controller.inputs;
 
@@ -223,29 +221,6 @@ public class GamePanel extends JPanel
         int red = cell.red;
         int green = cell.green;
         int blue = cell.blue;
-
-//        if (neural)
-//        {
-//            if (cell.virus)
-//            {
-//                red = green = blue = 64;
-//            }
-//            else if (isPlayer)
-//            {
-//                red = green = blue = 200;
-//            }
-//            else
-//            {
-//                if (smallestPlayer != null && smallestPlayer.canEat(cell))
-//                {
-//                    red = green = blue = 256;
-//                }
-//                else
-//                {
-//                    red = green = blue = 1;
-//                }
-//            }
-//        }
 
         g.setColor(constructColour(red, green, blue));
 
